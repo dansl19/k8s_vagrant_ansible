@@ -1,0 +1,41 @@
+---
+- name: download foo.zip locally
+  local_action:
+    get_url
+    url=https://storage.googleapis.com/kubernetes-release/release/${k8s_version}/bin/linux/amd64/{{ item }}
+    with_items:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+      - kube-proxy
+      - kubelet
+      - kubectl
+    dest=tools/foo.zip
+
+- name: Extract etcd into tools
+  unarchive:
+    src: etcd-${etcd_version}-linux-amd64.tar.gz
+    dest: ${dir}/../tools/
+
+- name: Extract crio into tools
+  unarchive:
+    src: tar -xf "crio-amd64-${crio_version}.tar.gz" 
+    dest: ${dir}/../tools/
+
+- name: rename runc.amd64 file 
+  command: mv runc.amd64 runc 
+
+- name: rename traefik_linux-amd64 file
+  command: mv traefik_linux-amd64 traefik
+
+- name: set proper permission 
+  shell: chmod +x \
+      kube-apiserver \
+      kube-controller-manager \
+      kube-scheduler \
+      kube-proxy \
+      kubelet \
+      kubectl \
+      runc \
+      traefik
+
