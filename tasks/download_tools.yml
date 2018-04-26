@@ -1,14 +1,14 @@
 ---
-#- name: download kube tools locally
-#  shell: curl -sSL -O "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version}}/bin/linux/amd64/{{ item }}"
-#  with_items:
-#    - kube-apiserver
-#    - kube-controller-manager
-#    - kube-schedule
-#    - kube-proxy
-#    - kubelet
-#    - kubectl
-#
+- name: download kube tools locally
+  shell: curl -sSL -O "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version}}/bin/linux/amd64/{{ item }}"
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-schedule
+    - kube-proxy
+    - kubelet
+    - kubectl
+
 - name: download etcd_version locally
   shell: curl -sSL -O "https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
 
@@ -41,14 +41,12 @@
 - name: rename traefik_linux-amd64 file
   command: mv traefik_linux-amd64 traefik
 
-- name: set proper permission 
-  shell: chmod +x \
-      kube-apiserver \
-      kube-controller-manager \
-      kube-scheduler \
-      kube-proxy \
-      kubelet \
-      kubectl \
-      runc \
-      traefik
-
+- name: Set proper permission on k8s tools
+  file: path="{{ base_dir }}/{{ item }}" mode=0775 
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-schedule
+    - kube-proxy
+    - kubelet
+    - kubectl
