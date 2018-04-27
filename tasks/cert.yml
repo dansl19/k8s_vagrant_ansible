@@ -1,41 +1,26 @@
 ---
-- name: download foo.zip locally
-  local_action:
-    get_url
-    url=https://storage.googleapis.com/kubernetes-release/release/${k8s_version}/bin/linux/amd64/{{ item }}
-    with_items:
-      - kube-apiserver
-      - kube-controller-manager
-      - kube-scheduler
-      - kube-proxy
-      - kubelet
-      - kubectl
-    dest=tools/foo.zip
+- name: change dir to certificate
+  command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH  && cfssl gencert -initca ca-csr.json | cfssljson -bare ca" 
 
-- name: Extract etcd into tools
-  unarchive:
-    src: etcd-${etcd_version}-linux-amd64.tar.gz
-    dest: ${dir}/../tools/
+- name: generate cert
+  command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json  -profile=kubernetes admin-csr.json | cfssljson -bare admin"
 
-- name: Extract crio into tools
-  unarchive:
-    src: tar -xf "crio-amd64-${crio_version}.tar.gz" 
-    dest: ${dir}/../tools/
 
-- name: rename runc.amd64 file 
-  command: mv runc.amd64 runc 
+- name: Generate cert for every server 
+  shell: |
+      cd {{ base_dir }}/certificates
+      export PATH=$HOME/go/bin:$PATH
+      cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=worker-{{ item }},192.168.199.2{{ item }} -profile=kubernetes
+      'worker-{{ item }}-csr.json | /Users/dys/go/bin/cfssljson -bare worker-{{ item }}'
+  loop: 
+    - 0
+    - 1
+    - 2
+       
 
-- name: rename traefik_linux-amd64 file
-  command: mv traefik_linux-amd64 traefik
-
-- name: set proper permission 
-  shell: chmod +x \
-      kube-apiserver \
-      kube-controller-manager \
-      kube-scheduler \
-      kube-proxy \
-      kubelet \
-      kubectl \
-      runc \
-      traefik
-
+#- name: generate cert
+#  command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=worker-{{ item }},192.168.199.2{{ item }} -profile=kubernetes && "worker-{{ item }}-csr.json" | "cfssljson -bare worker-{{ item }}""
+#  loop:
+#    - 0
+#    - 1
+#    - 2

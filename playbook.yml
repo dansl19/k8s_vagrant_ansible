@@ -8,17 +8,19 @@
     crio_version: "v1.9.0"
     base_dir: "/Users/dys/Desktop/k8s/kubernetes-the-hard-way-vagrant"
   tasks:
-    - include: tasks/download_tools.yml
-
-- hosts: all
-  sudo: true
-  vars:
-    k8s_versionx: "v1.9.2"
-    etcd_version: "v3.2.15"
-    cfssl_version: "R1.2"
-    traefik_version: "v1.3.8"
-    crio_version: "v1.9.0"
-    dir: "/Users/dys/Desktop/k8s/kubernetes-the-hard-way-vagrant" 
-  tasks:
 #    - include: tasks/download_tools.yml
-    - include: tasks/task3.yml
+    - include: tasks/cert.yml
+
+
+#- hosts: all
+#  sudo: true
+#  vars:
+#    k8s_versionx: "v1.9.2"
+#    etcd_version: "v3.2.15"
+#    cfssl_version: "R1.2"
+#    traefik_version: "v1.3.8"
+#    crio_version: "v1.9.0"
+#    dir: "/Users/dys/Desktop/k8s/kubernetes-the-hard-way-vagrant" 
+#  tasks:
+##    - include: tasks/download_tools.yml
+#    - include: tasks/task3.yml
