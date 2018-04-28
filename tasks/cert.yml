@@ -6,21 +6,11 @@
   command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json  -profile=kubernetes admin-csr.json | cfssljson -bare admin"
 
 
-- name: Generate cert for every server 
-  shell: |
-      cd {{ base_dir }}/certificates
-      export PATH=$HOME/go/bin:$PATH
-      cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=worker-{{ item }},192.168.199.2{{ item }} -profile=kubernetes
-      'worker-{{ item }}-csr.json | /Users/dys/go/bin/cfssljson -bare worker-{{ item }}'
-  loop: 
+ 
+
+- name: generate cert
+  command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=worker-{{ item }},192.168.199.2{{ item }} -profile=kubernetes worker-{{ item }}-csr.json | cfssljson -bare worker-{{ item }}"
+  loop:
     - 0
     - 1
     - 2
-       
-
-#- name: generate cert
-#  command: bash -lc "cd {{ base_dir }}/certificates && export PATH=$HOME/go/bin:$PATH && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=worker-{{ item }},192.168.199.2{{ item }} -profile=kubernetes && "worker-{{ item }}-csr.json" | "cfssljson -bare worker-{{ item }}""
-#  loop:
-#    - 0
-#    - 1
-#    - 2

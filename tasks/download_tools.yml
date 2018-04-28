@@ -7,7 +7,7 @@
     - kube-schedule
     - kube-proxy
     - kubelet
-    - kubectl
+      # - kubectl
 
 - name: download etcd_version locally
   shell: curl -sSL -O "https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
