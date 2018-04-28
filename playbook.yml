@@ -9,7 +9,8 @@
     base_dir: "/Users/dan/Work/k8s_vagrant_ansible"
   tasks:
 #    - include: tasks/download_tools.yml
-    - include: tasks/cert.yml
+#    - include: tasks/cert.yml
+    - include: tasks/generate-kubeconfig-kube-proxy.yml
 
 
 #- hosts: all
