@@ -1,0 +1,33 @@
+--- 
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Install the package "socat" and "libgpgme11" 
+  apt:
+    name: "{{ item }}" 
+    state: present 
+  with_item:
+    - libgpgme11
+    - socat
+
+- name: create dir workers
+  file:
+    path= "{{ item }}" 
+    state=directory
+  with_item:
+    - /etc/containers 
+    - /etc/cni/net.d 
+    - /etc/crio 
+    - /opt/cni/bin 
+    - /usr/local/libexec/crio
+    - /var/lib/kubelet 
+    - /var/lib/kube-proxy 
+    - /var/lib/kubernetes 
+    - /var/run/kubernetes
+
+- name: copy cni-plugins-amd64-v0.6.0.tgz to worker 
+  copy: 
+    src: /Users/dan/Work/k8s_vagrant_ansible/certificates/cni-plugins-amd64-v0.6.0.tgz 
+    dest: /opt/cni/bin/

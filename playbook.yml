@@ -27,3 +27,6 @@
   tasks:
  #   - include: tasks/setup-etcd.yml
     - include: tasks/setup-controller-services.yml
+    - include: tasks/rbac.yml
+      when: ansible_hostname == 'controller-0'
+      #when: inventory_hostname=controller-0

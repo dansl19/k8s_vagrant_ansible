@@ -1,0 +1,19 @@
+---
+- name: create kubectl playbook dir on controllers
+  file: 
+    path=/opt/k8s/
+    state=directory
+ 
+- name: copy yaml files servers 
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/manifest/{{ item }}
+    dest: /opt/k8s/{{ item }} 
+  with_items: 
+    - ClusterRole.yaml
+    - ClusterRoleBinding.yaml
+
+- name: run ClusterRole + BindingRole servers
+  command: kubectl apply -f  /opt/k8s/{{ item }} 
+  with_items: 
+    - ClusterRole.yaml
+    - ClusterRoleBinding.yaml
