@@ -23,7 +23,7 @@
 
 - name: copy kubectl tools to controllers 
   copy: 
-    src: /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    src: /Users/dan/Work/k8s_vagrant_ansible/{{ item }}
     dest: /usr/local/bin/{{ item }}
     mode: 0755
   with_items:
@@ -52,6 +52,10 @@
 
 - name: enable etc systemd
   systemd:
-    name: kube-apiserver kube-controller-manager kube-scheduler
+    name: "{{ item }}"
     state: started
     enabled: True
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager 
+    - kube-scheduler

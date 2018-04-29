@@ -4,7 +4,7 @@
   with_items:
     - kube-apiserver
     - kube-controller-manager
-    - kube-schedule
+    - kube-scheduler
     - kube-proxy
     - kubelet
       # - kubectl

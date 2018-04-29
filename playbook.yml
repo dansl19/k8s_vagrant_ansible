@@ -25,5 +25,5 @@
   sudo: yes
   serial: 0
   tasks:
-    - include: tasks/setup-etcd.yml
+ #   - include: tasks/setup-etcd.yml
     - include: tasks/setup-controller-services.yml
