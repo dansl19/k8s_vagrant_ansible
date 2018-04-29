@@ -1,0 +1,57 @@
+---
+- name: create etc/etcd files on controllers
+  file:
+    path=/var/lib/kubernetes
+    state=directory
+
+- name: copy cert to controllers servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/certificates/{{ item }}
+    dest: /var/lib/kubernetes/{{ item }}
+    mode: 0755
+  with_items:
+    - ca.pem
+    - ca-key.pem
+    - kubernetes-key.pem
+    - kubernetes.pem
+
+
+- name: copy encryption-config to controllers servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/encryption-config.yaml
+    dest: /var/lib/kubernetes/encryption-config.yaml
+
+- name: copy kubectl tools to controllers 
+  copy: 
+    src: /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    mode: 0755
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kubectl
+
+- name: copy kube-apiserver.service systemd to controllers servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-kube-apiserver.service
+    dest: /etc/systemd/system/kube-apiserver.service
+
+- name: copy kube-scheduler.service systemd to controllers servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-kube-scheduler.service
+    dest: /etc/systemd/system/kube-scheduler.service
+
+- name: copy kube-controller-manager.service systemd to controllers servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-kube-controller-manager.service
+    dest: /etc/systemd/system/kube-controller-manager.service
+
+- name: just force systemd to reread configs (2.4 and above)
+  systemd: daemon_reload=yes
+
+- name: enable etc systemd
+  systemd:
+    name: kube-apiserver kube-controller-manager kube-scheduler
+    state: started
+    enabled: True

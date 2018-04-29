@@ -3,9 +3,11 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  #config.vm.provision :shell, path: "bootstrap.sh"
+  config.vm.provision :shell, path: "bootstrap.sh"
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "512"
+    vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000 ]
+  config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime", run: "always"
   end
 
   # must be at the top
@@ -47,6 +49,7 @@ Vagrant.configure("2") do |config|
   end
     config.vm.provision :ansible do |ansible|
       ansible.playbook = "playbook.yml"
+      ansible.inventory_path = ".vagrant/hosts"
     end
 
 end
