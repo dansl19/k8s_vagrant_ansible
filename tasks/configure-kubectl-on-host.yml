@@ -1,0 +1,12 @@
+--- 
+- name: set-cluster
+  command: kubectl config set-cluster kubernetes-the-hard-way --certificate-authority="{{base_dir}}/certificates/ca.pem" --embed-certs=true --server=https://192.168.199.40:6443
+
+- name: set-credential admin
+  command: kubectl config set-credentials admin --client-certificate="{{base_dir}}/certificates/admin.pem" --client-key="{{base_dir}}/certificates/admin-key.pem"
+
+- name: set-context 
+  command: kubectl config set-context kubernetes-the-hard-way --cluster=kubernetes-the-hard-way --user=admin
+
+- name: use-context 
+  command: kubectl config use-context kubernetes-the-hard-way

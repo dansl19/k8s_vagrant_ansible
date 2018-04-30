@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
         c.vm.hostname = "worker-#{n}"
         c.vm.network "private_network", ip: "192.168.199.2#{n}"
 
-        c.vm.provision :shell, :path => "scripts/vagrant-setup-routes.bash"
+       # c.vm.provision :shell, :path => "scripts/vagrant-setup-routes.bash"
         c.vm.provision :shell, :path => "scripts/vagrant-setup-hosts-file.bash"
     end
   end

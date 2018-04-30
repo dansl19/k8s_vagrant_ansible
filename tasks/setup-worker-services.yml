@@ -1,22 +1,24 @@
 --- 
-- name: Upgrade all packages to the latest version
+- name: Update and upgrade apt packages
+  become: true
   apt:
-    name: "*"
-    state: latest
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
 
 - name: Install the package "socat" and "libgpgme11" 
   apt:
     name: "{{ item }}" 
     state: present 
-  with_item:
+  with_items:
     - libgpgme11
     - socat
 
 - name: create dir workers
   file:
-    path= "{{ item }}" 
-    state=directory
-  with_item:
+    path: "{{ item }}" 
+    state: directory
+  with_items:
     - /etc/containers 
     - /etc/cni/net.d 
     - /etc/crio 
@@ -29,5 +31,96 @@
 
 - name: copy cni-plugins-amd64-v0.6.0.tgz to worker 
   copy: 
-    src: /Users/dan/Work/k8s_vagrant_ansible/certificates/cni-plugins-amd64-v0.6.0.tgz 
+    src: /Users/dan/Work/k8s_vagrant_ansible/cni-plugins-amd64-v0.6.0.tgz 
     dest: /opt/cni/bin/
+
+
+- name: copy tools to worker 
+  copy: 
+    src:  /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+  with_items: 
+    - runc
+    - crio
+    - kube-proxy
+    - kubelet
+    - kubectl
+
+
+- name: copy conmon pause  to worker 
+  copy: 
+    src: /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    dest: /usr/local/libexec/crio/{{ item }}
+  with_items: 
+    - conmon
+    - pause
+
+
+- name: copy crio.conf seccomp.json to worker
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    dest: /etc/crio/{{ item }}
+  with_items:
+    - crio.conf
+    - seccomp.json
+
+- name: copy policy.json to worker
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/tools/{{ item }}
+    dest: /etc/containers/{{ item }}
+  with_items:
+    - policy.json
+ 
+- name: copy  10-bridge.conf servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-10-bridge.conf
+    dest: /etc/cni/net.d/10-bridge.conf
+
+
+- name: copy 99-loopback.conf servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/99-loopback.conf
+    dest: /etc/cni/net.d/99-loopback.conf
+
+
+- name: copy crio.service servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-crio.service
+    dest: /etc/systemd/system/crio.service
+
+- name: copy ca.pem servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/certificates/ca.pem
+    dest: /var/lib/kubernetes/
+
+
+- name: copy hostname-key.pem servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/certificates/{{ inventory_hostname }}.pem
+    dest: /var/lib/kubelet/{{ inventory_hostname }}.pem
+
+
+- name: copy kubeconfig servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}.kubeconfig
+    dest: /var/lib/kubelet/kubeconfig
+
+- name: copy $(hostname)-kubelet.service servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/{{ inventory_hostname }}-kubelet.service
+    dest: /etc/systemd/system/kubelet.service
+
+- name: copy kube-proxy.service servers
+  copy:
+    src: /Users/dan/Work/k8s_vagrant_ansible/config/kube-proxy.service
+    dest: /etc/systemd/system/
+
+- name: enable etc systemd
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - crio
+    - kubelet
+    - kube-proxy
